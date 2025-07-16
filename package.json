@@ -1,0 +1,19 @@
+{
+  "name": "devmate",
+  "version": "1.0.0",
+  "description": "It's like a Tinder for Developers only.",
+  "keywords": [
+    "JavaScript",
+    "Node.js"
+  ],
+  "license": "ISC",
+  "author": "Pritam Saha",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
