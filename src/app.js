@@ -4,23 +4,25 @@ const app=express()
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 
+// app.get("/test",(req,res)=>{
+//     res.send({"name":"Pritam Saha", "age":25})
+// })
 
-app.use("/test",(req,res)=>{
-    res.send("Testing page")
+app.use("/",(req,res,next)=>{
+   // res.send({"name":"Pritam Saha", "age":25})
+   console.log("1st route handler")
+   res.send("Hello")
+   next()
+   
+},
+(req,res)=>{
+    console.log("2nd route handler")
+    res.send("Hello 2")
 })
 
-app.use("/hello/2",(req,res)=>{
-    res.send("hello 2 page")
-})
-
-app.use("/hello",(req,res)=>{
-    res.send("hello page")
-})
-
-app.use("/",(req,res)=>{
-    res.send("Namaste")
-})
-
+// app.delete("/test",(req,res)=>{
+//     res.send("Data deleted successfully")
+// })
 
 app.listen(3000, ()=>{
     console.log("server is running on port 3000")
