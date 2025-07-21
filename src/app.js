@@ -4,17 +4,13 @@ const User = require('./models/user')
 const app=express()
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
+app.use(express.json()) // Middleware to parse JSON bodies
 
 app.post("/signup",async (req, res) => {
-   const user = new User({
-       firstName: "pritam",
-       lastName: "Saha",
-       email: "saha7pritam@gmail.com",
-       password: "xyz123",
-       gender: "Male",
-       age: 25
-   })
 
+    //console.log("User data received:", req.body)
+   const user = new User(req.body)
+   console.log("User data received:", req.body)
    try {
        const savedUser = await user.save()
        res.send("User created successfully")
