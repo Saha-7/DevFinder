@@ -65,25 +65,47 @@ app.post("/signup", async (req, res) => {
 app.delete("/user", async (req, res) => {
   const userId = req.body.userId;
   try {
-    await User.findByIdAndDelete({_id: userId})
+    await User.findByIdAndDelete({ _id: userId });
     // await User.findByIdAndDelete(userId)  //use any one of these two lines
     res.send("User deleted successfully");
-  }catch (error) {
+  } catch (error) {
     res.status(500).send("Error deleting user: " + error.message);
   }
 });
 
 // Route to update user by ID & data
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
-  try{
-    await User.findByIdAndUpdate({_id: userId}, data,{runValidators: true});
+
+  try {
+    const Allowed_Updates = [
+      
+      "photoUrl",
+      "about",
+      "skills",
+      "gender",
+      "age",
+    ];
+
+    const isupdateAllowed = Object.keys(data).every((key) =>
+      Allowed_Updates.includes(key)
+    );
+    if (!isupdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+    if(data?.skills.length>10){
+      throw new Error("Skills cannot be more than 10");
+    }
+    const user = await User.findByIdAndUpdate(userId , data, {
+      runValidators: true
+    });
+    console.log("User updated:", user);
     res.send("User updated successfully");
-  }catch(error) {
+  } catch (error) {
     res.status(500).send("Error updating user: " + error.message);
   }
-})
+});
 
 connectDB()
   .then(() => {
