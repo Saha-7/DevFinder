@@ -2,10 +2,33 @@ const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const e = require("express");
+const { validateSignUpData } = require("./utils/validation");
 const app = express();
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 app.use(express.json()); // Middleware to parse JSON bodies
+
+
+app.post("/signup", async (req, res) => {
+  //Validation of data
+  validateSignUpData(req)
+
+
+
+  //Encrypt the password
+
+
+  //console.log("User data received:", req.body)
+  const user = new User(req.body);
+  console.log("User data received:", req.body);
+  try {
+    const savedUser = await user.save();
+    res.send("User created successfully");
+  } catch (error) {
+    res.status(400).send("Error creating user: " + error.message);
+  }
+});
+
 
 // Route to get user by email using Model.findOne()
 app.get("/user", async (req, res) => {
@@ -49,17 +72,7 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.post("/signup", async (req, res) => {
-  //console.log("User data received:", req.body)
-  const user = new User(req.body);
-  console.log("User data received:", req.body);
-  try {
-    const savedUser = await user.save();
-    res.send("User created successfully");
-  } catch (error) {
-    res.status(400).send("Error creating user: " + error.message);
-  }
-});
+
 
 // Route to Delete user by ID
 app.delete("/user", async (req, res) => {
