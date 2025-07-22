@@ -3,10 +3,12 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt")
+const cookieParser = require("cookie-parser")
 const saltRounds = 13;
 
 
 const app = express();
+app.use(cookieParser())
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 app.use(express.json()); // Middleware to parse JSON bodies
@@ -47,6 +49,12 @@ app.post("/login", async (req, res) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if(isPasswordValid){
+      // create JWT token
+
+      res.cookie("token", "your_sdfgnbdgs_sdgbf_segdbfd")
+
+
+      // Add the token inside Cookie
       res.send("Login successful");
     }else{
       throw new Error("Invalid Credentials");
@@ -56,6 +64,15 @@ app.post("/login", async (req, res) => {
   }
 })
 
+// Route to get Profile
+app.get("/profile", async (req, res) => {
+  const cookies = req.cookies
+
+  const {token} = cookies;
+  // Validate my token
+  console.log("Cookies received:", cookies);
+  res.send("Profile data will be here");
+})
 
 // Route to get user by email using Model.findOne()
 app.get("/user", async (req, res) => {
