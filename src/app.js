@@ -1,8 +1,11 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const e = require("express");
 const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt")
+const saltRounds = 13;
+
+
 const app = express();
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
@@ -10,19 +13,24 @@ app.use(express.json()); // Middleware to parse JSON bodies
 
 
 app.post("/signup", async (req, res) => {
+  try {
   //Validation of data
   validateSignUpData(req)
 
 
-
   //Encrypt the password
+  const {firstName, lastName, email, password} = req.body;
+  const passwordHash = await bcrypt.hash(password, saltRounds)
+  console.log("Password hash:", passwordHash);
 
 
   //console.log("User data received:", req.body)
-  const user = new User(req.body);
-  console.log("User data received:", req.body);
-  try {
-    const savedUser = await user.save();
+  const user = new User({
+    firstName, lastName, email, password: passwordHash
+  });
+ // console.log("User data received:", req.body);
+  
+    await user.save();
     res.send("User created successfully");
   } catch (error) {
     res.status(400).send("Error creating user: " + error.message);
