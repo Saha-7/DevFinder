@@ -5,6 +5,7 @@ const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt")
 const cookieParser = require("cookie-parser")
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 const saltRounds = 13;
 
 
@@ -67,26 +68,34 @@ app.post("/login", async (req, res) => {
 })
 
 // Route to get Profile
-app.get("/profile", async (req, res) => {
-  try{const cookies = req.cookies
-  //console.log("Cookies received:", cookies);
+app.get("/profile", userAuth, async (req, res) => {
+   try{
+    
+    // These are old redundent codes, which are currently handled by userAuth middleware
 
-  const {token} = cookies;
-  if(!token){
-    throw new Error("Invalid Token");
-  }
-  // Validate my token
-  const decodedMessage = await jwt.verify(token, "DevFinder@123");
 
-  const {_id} = decodedMessage;
-  console.log("Loggeded user ID:", _id);
-  const user = await User.findOne({_id: _id});
-  if(!user){
-    throw new Error("User not found");
-  }
-  res.send("Profile data",);
+// const cookies = req.cookies
+//   //console.log("Cookies received:", cookies);
+
+//   const {token} = cookies;
+//   if(!token){
+//     throw new Error("Invalid Token");
+//   }
+//   // Validate my token
+//   const decodedMessage = await jwt.verify(token, "DevFinder@123");
+
+//   const {_id} = decodedMessage;
+//   console.log("Loggeded user ID:", _id);
+//   const user = await User.findOne({_id: _id});
+//  // console.log("User found:", user?.firstName+ " "+user?.lastName);
+//   if(!user){
+//     throw new Error("User not found");
+//   }
+
+  const user = req.user
+  res.json(user);
   }catch(err){
-    res.status(400).send("Error getting Profile Data: " + error.message);
+    res.status(400).send("Error getting Profile Data: " + err.message);
   }
 })
 
