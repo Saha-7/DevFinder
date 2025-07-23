@@ -52,9 +52,11 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if(isPasswordValid){
       // create JWT token
-      const token = await jwt.sign({_id:user._id}, "DevFinder@123")
+      const token = await jwt.sign({_id:user._id}, "DevFinder@123", { expiresIn: '1d' })
       console.log("Token generated:", token);
-      res.cookie("token", token)
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      })
 
 
       // Add the token inside Cookie
@@ -96,6 +98,16 @@ app.get("/profile", userAuth, async (req, res) => {
   res.json(user);
   }catch(err){
     res.status(400).send("Error getting Profile Data: " + err.message);
+  }
+})
+
+app.post("/sendconnectionrequest", userAuth, async (req, res) => {
+  try{
+    const user = req.user
+    console.log("User sending connection request:", user.firstName, user.lastName);
+    res.send(user.firstName+ " " + "sent you a connection request");
+  }catch(err) {
+    res.status(400).send("Error sending connection request: " + err.message);
   }
 })
 
