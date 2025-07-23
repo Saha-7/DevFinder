@@ -4,6 +4,7 @@ const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt")
 const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken");
 const saltRounds = 13;
 
 
@@ -50,8 +51,9 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if(isPasswordValid){
       // create JWT token
-
-      res.cookie("token", "your_sdfgnbdgs_sdgbf_segdbfd")
+      const token = await jwt.sign({_id:user._id}, "DevFinder@123")
+      console.log("Token generated:", token);
+      res.cookie("token", token)
 
 
       // Add the token inside Cookie
@@ -66,12 +68,26 @@ app.post("/login", async (req, res) => {
 
 // Route to get Profile
 app.get("/profile", async (req, res) => {
-  const cookies = req.cookies
+  try{const cookies = req.cookies
+  //console.log("Cookies received:", cookies);
 
   const {token} = cookies;
+  if(!token){
+    throw new Error("Invalid Token");
+  }
   // Validate my token
-  console.log("Cookies received:", cookies);
-  res.send("Profile data will be here");
+  const decodedMessage = await jwt.verify(token, "DevFinder@123");
+
+  const {_id} = decodedMessage;
+  console.log("Loggeded user ID:", _id);
+  const user = await User.findOne({_id: _id});
+  if(!user){
+    throw new Error("User not found");
+  }
+  res.send("Profile data",);
+  }catch(err){
+    res.status(400).send("Error getting Profile Data: " + error.message);
+  }
 })
 
 // Route to get user by email using Model.findOne()
