@@ -1,11 +1,94 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const e = require("express");
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt")
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken");
+const saltRounds = 13;
+
+
 const app = express();
+app.use(cookieParser())
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 app.use(express.json()); // Middleware to parse JSON bodies
+
+// Route to handle user signup
+app.post("/signup", async (req, res) => {
+  try {
+  //Validation of data
+  validateSignUpData(req)
+
+
+  //Encrypt the password
+  const {firstName, lastName, email, password} = req.body;
+  const passwordHash = await bcrypt.hash(password, saltRounds)
+  console.log("Password hash:", passwordHash);
+
+
+  //console.log("User data received:", req.body)
+  const user = new User({
+    firstName, lastName, email, password: passwordHash
+  });
+ // console.log("User data received:", req.body);
+  
+    await user.save();
+    res.send("User created successfully");
+  } catch (error) {
+    res.status(400).send("Error creating user: " + error.message);
+  }
+});
+
+
+app.post("/login", async (req, res) => {
+  try{
+    const { email, password } = req.body;
+    const user = await User.findOne({email:email})
+    if(!user){
+      throw new Error("Invalid Credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    if(isPasswordValid){
+      // create JWT token
+      const token = await jwt.sign({_id:user._id}, "DevFinder@123")
+      console.log("Token generated:", token);
+      res.cookie("token", token)
+
+
+      // Add the token inside Cookie
+      res.send("Login successful");
+    }else{
+      throw new Error("Invalid Credentials");
+    }
+  } catch (error) {
+    res.status(400).send("Error user: " + error.message);
+  }
+})
+
+// Route to get Profile
+app.get("/profile", async (req, res) => {
+  try{const cookies = req.cookies
+  //console.log("Cookies received:", cookies);
+
+  const {token} = cookies;
+  if(!token){
+    throw new Error("Invalid Token");
+  }
+  // Validate my token
+  const decodedMessage = await jwt.verify(token, "DevFinder@123");
+
+  const {_id} = decodedMessage;
+  console.log("Loggeded user ID:", _id);
+  const user = await User.findOne({_id: _id});
+  if(!user){
+    throw new Error("User not found");
+  }
+  res.send("Profile data",);
+  }catch(err){
+    res.status(400).send("Error getting Profile Data: " + error.message);
+  }
+})
 
 // Route to get user by email using Model.findOne()
 app.get("/user", async (req, res) => {
@@ -49,41 +132,53 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.post("/signup", async (req, res) => {
-  //console.log("User data received:", req.body)
-  const user = new User(req.body);
-  console.log("User data received:", req.body);
-  try {
-    const savedUser = await user.save();
-    res.send("User created successfully");
-  } catch (error) {
-    res.status(400).send("Error creating user: " + error.message);
-  }
-});
+
 
 // Route to Delete user by ID
 app.delete("/user", async (req, res) => {
   const userId = req.body.userId;
   try {
-    await User.findByIdAndDelete({_id: userId})
+    await User.findByIdAndDelete({ _id: userId });
     // await User.findByIdAndDelete(userId)  //use any one of these two lines
     res.send("User deleted successfully");
-  }catch (error) {
+  } catch (error) {
     res.status(500).send("Error deleting user: " + error.message);
   }
 });
 
 // Route to update user by ID & data
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
-  try{
-    await User.findByIdAndUpdate({_id: userId}, data,{runValidators: true});
+
+  try {
+    const Allowed_Updates = [
+      
+      "photoUrl",
+      "about",
+      "skills",
+      "gender",
+      "age",
+    ];
+
+    const isupdateAllowed = Object.keys(data).every((key) =>
+      Allowed_Updates.includes(key)
+    );
+    if (!isupdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+    if(data?.skills.length>10){
+      throw new Error("Skills cannot be more than 10");
+    }
+    const user = await User.findByIdAndUpdate(userId , data, {
+      runValidators: true
+    });
+    console.log("User updated:", user);
     res.send("User updated successfully");
-  }catch(error) {
+  } catch (error) {
     res.status(500).send("Error updating user: " + error.message);
   }
-})
+});
 
 connectDB()
   .then(() => {
