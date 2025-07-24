@@ -1,12 +1,13 @@
 const express = require('express');
 const User = require('../models/user');
 const { userAuth } = require('../middlewares/auth');
+const { validateEditProfileData } = require('../utils/validation');
 
 const profileRouter = express.Router()
 
 
 // Route to get Profile
-profileRouter.get("/profile", userAuth, async (req, res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
    try{
     
     // These are old redundent codes, which are currently handled by userAuth middleware
@@ -34,6 +35,27 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
   res.json(user);
   }catch(err){
     res.status(400).send("Error getting Profile Data: " + err.message);
+  }
+})
+
+
+profileRouter.patch("/profile/edit", userAuth, async(req,res)=>{
+  try{
+    if(!validateEditProfileData(req)){
+      throw new Error("Invalid fields for profile edit");
+    }
+    const Loggededuser = req.user
+   // console.log("Loggeded user:", Loggededuser);
+    Object.keys(req.body).forEach((key) => {
+      Loggededuser[key] = req.body[key];
+    });
+    await Loggededuser.save()
+   // console.log("Updated user", Loggededuser)
+   res.json({ message: "Profile updated successfully",
+    data: Loggededuser
+   })
+  }catch(err){
+    res.status(400).send("Error updating Profile Data: " + err.message);
   }
 })
 
