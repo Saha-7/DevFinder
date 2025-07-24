@@ -1,7 +1,8 @@
 const express = require('express');
 const User = require('../models/user');
 const { userAuth } = require('../middlewares/auth');
-const { validateEditProfileData } = require('../utils/validation');
+const { validateEditProfileData, validateEditPasswordData } = require('../utils/validation');
+//const saltRounds = 13;
 
 const profileRouter = express.Router()
 
@@ -59,6 +60,33 @@ profileRouter.patch("/profile/edit", userAuth, async(req,res)=>{
   }
 })
 
+
+
+// profileRouter.patch("/profile/password", userAuth, async(req,res)=>{
+//   try{
+//     validateEditPasswordData(req)
+//     const { currentPassword, newPassword} = req.body
+//     const user = req.user
+
+//     // SECURITY CHECK: Make sure user knows their current password before changing it
+//     const isCurrentPasswordCorrect = await user.validatePassword(currentPassword)
+//     if(!isCurrentPasswordCorrect){
+//       throw new Error("Current password is incorrect");
+//     }
+    
+//     // Update the password (pre-save middleware will hash it automatically)
+//     user.password = newPassword
+//     await user.save()
+
+//     res.json({ 
+//       message: "Password updated successfully"
+//       // 🚫 NEVER send password back in response!
+//     });
+//   }
+//   catch(err){
+//     res.status(400).send("Error updating Password: " + err.message);
+//   }
+// })
 
 
 module.exports = profileRouter;
