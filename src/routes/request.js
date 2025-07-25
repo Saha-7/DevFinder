@@ -47,9 +47,57 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
     const data = await connectionRequest.save()
 
     res.json({
-      message: req.user.firstName + " is "+ status +  " in the request, sent by " + toUser.firstName,
+      message: req.user.firstName + " "+ status +  " " + toUser.firstName,
       data
     })
+
+  }catch(err) {
+    res.status(400).send("Error: " + err.message);
+  }
+})
+
+
+
+
+requestRouter.post("/request/review/:status/:requestId", userAuth, async(req,res)=> {
+  try{
+    
+    const loggedInUser = req.user
+    //loggedInUser is ==> toUserId
+    // if Status is interested
+
+    const {status, requestId} = req.params
+    const allowedStatus = ["accepted", "rejected"]
+    if(!allowedStatus.includes(status)){
+      return res.status(400).json({
+        message: "Invalid Status type"
+      })
+    }
+
+    const connectionRequest = await ConnectionRequest.findOne({
+      _id: requestId,
+      toUserId: loggedInUser._id,
+      status: "interested"
+    })
+    console.log(connectionRequest)
+    if (!connectionRequest){
+      return res.status(404).json({
+        message: "connection request not found"
+      })
+    }
+
+    // Update the status of the connection request
+    connectionRequest.status= status
+
+    // Save the updated connection request
+    const data = await connectionRequest.save()
+    console.log(data)
+
+    res.json({
+      message: "Connection request " + status + " successfully",
+      data
+    })
+
 
   }catch(err) {
     res.status(400).send("Error: " + err.message);
