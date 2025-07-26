@@ -6,7 +6,10 @@ const cors = require("cors");
 
 const app = express();
 app.use(cookieParser())
-app.use(cors())
+app.use(cors({
+  origin: "http://localhost:5173", // Update with your frontend URL
+  credentials: true, // Allow cookies to be sent with requests
+}))
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 
