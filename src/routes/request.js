@@ -5,7 +5,7 @@ const User = require('../models/user');
 
 const requestRouter = express.Router()
 
-const {sendEmail} = require("../utils/sendEmail")
+const sendEmail = require("../utils/sendEmail")
 
 
 requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
@@ -49,10 +49,17 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
 
     const data = await connectionRequest.save()
 
-    const emailRes = await sendEmail.run(
-      "A new friend request from " + req.user.firstName,
-      req.user.firstName + " "+ status +  " " + toUser.firstName)
-    console.log(emailRes)
+    // FIXED: Make email sending non-blocking and handle errors properly
+    try {
+      const emailRes = await sendEmail.run(
+        "A new friend request from " + req.user.firstName,
+        req.user.firstName + " "+ status +  " " + toUser.firstName
+      );
+      console.log("Email sent successfully:", emailRes);
+    } catch (emailError) {
+      // Don't fail the entire request if email fails
+      console.log("Email sending failed (but request succeeded):", emailError.message);
+    }
 
     res.json({
       message: req.user.firstName + " "+ status +  " " + toUser.firstName,
