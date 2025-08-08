@@ -6,7 +6,6 @@ const ConnectionRequestModel = require("../models/connectionRequest")
 cron.schedule("0 9 * * *", ()=>{
     // Send mail to those people who got Request from Yesterday
     try{
-
         const yesterday = subDays(new Date(),1)
 
         const yesterdayStart = startOfDay(yesterday)
@@ -18,7 +17,13 @@ cron.schedule("0 9 * * *", ()=>{
                 $gte: yesterdayStart,
                 $lt: yesterdayEnd
             }
-        })
+        }).populate("fromUserId toUserId")
+
+        const listOfEmails = [...new Set(pendingRequests.map(req=> req.toUserId.email))]
+
+        for(const email of listOfEmails){
+            // Send emails
+        }
 
     }catch(err){
         console.log(err)
