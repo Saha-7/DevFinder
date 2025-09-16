@@ -14,7 +14,7 @@ authRouter.post("/signup", async (req, res) => {
     //Encrypt the password
     const { firstName, lastName, email, password } = req.body;
     const passwordHash = await bcrypt.hash(password, saltRounds);
-    console.log("Password hash:", passwordHash);
+    //console.log("Password hash:", passwordHash);
 
     //console.log("User data received:", req.body)
     const user = new User({
@@ -26,7 +26,7 @@ authRouter.post("/signup", async (req, res) => {
     // console.log("User data received:", req.body);
 
     const saveduser = await user.save();
-    // create JWT token
+    // creating the JWT token
     const token = await user.getJWT();
     console.log("Token generated:", token);
 
