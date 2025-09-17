@@ -2,9 +2,9 @@ const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const paymentRouter = express.Router();
 const razorpayInstance = require("../utils/razorpay");
+const Payment = require("../models/payment");
 
 paymentRouter.post("/payment/create", userAuth, async (req, res) => {
-    
   try {
     //Creating the Order
     const order = await razorpayInstance.orders.create({
@@ -21,8 +21,20 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
     //Saving the response in database
     console.log(order);
 
+    const payment = new Payment({
+        userId: req.user._id,
+        orderId: order.id,
+        amount: order.amount,
+        status: order.status,
+        currency: order.currency,
+        receipt: order.receipt,
+        notes: order.notes,
+    })
+
+    const savedPayment = await payment.save()
+
     //Return back my order details to frontend
-    res.json({ order });
+    res.json({ ...savedPayment.toJSON() });
   } catch (err) {
     console.log("Full error object:", err);
     console.log("Error message:", err.message);
