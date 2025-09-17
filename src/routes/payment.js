@@ -3,6 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 const paymentRouter = express.Router();
 const razorpayInstance = require("../utils/razorpay");
 const Payment = require("../models/payment");
+const { membershipAmount } = require("../utils/constants");
 
 paymentRouter.post("/payment/create", userAuth, async (req, res) => {
   try {
@@ -10,7 +11,7 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
     const {firstName, lastName, email} = req.user
     //Creating the Order
     const order = await razorpayInstance.orders.create({
-      amount: 50000, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      amount: membershipAmount[membershipType]*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
       currency: "INR",
       receipt: "order_rcptid_11",
       notes: {
