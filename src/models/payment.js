@@ -39,7 +39,7 @@ const paymentSchema = new mongoose.Schema(
       },
       membershipType: {
         type: String,
-        enum: ["silver", "gold"],
+        enum: ["platinum", "gold"],
         default: "silver",
       },
     },
