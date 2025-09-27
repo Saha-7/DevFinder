@@ -12,7 +12,12 @@ const initializeSocket =(server) =>{
 
       //Handle connection
       io.on("connection", (socket)=>{
-        //Handle events
+        //Handling different events
+        socket.on("joinChat", ()=>{})
+
+        socket.on("sendMessage", ()=>{})
+
+        socket.on("disconnect", ()=>{})
       })
 }
 
