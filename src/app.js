@@ -4,11 +4,13 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const cookieParser = require("cookie-parser")
 const cors = require("cors");
-
+const http = require("http")
+const socket = require("socket.io")
 
 
 
 require('./utils/cronjob')
+
 
 const app = express();
 app.use(cookieParser())
@@ -34,6 +36,15 @@ app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", paymentRouter)
 
+
+const server = http.createServer(app)
+
+const io = socket(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+})
 
 // Route to get user by email using Model.findOne()
 // app.get("/user",userAuth,  async (req, res) => {
@@ -128,7 +139,7 @@ app.patch("/user/:userId", async (req, res) => {
 connectDB()
   .then(() => {
     console.log("Connected to database successfully");
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log("server is running on port 3000");
     });
   })
