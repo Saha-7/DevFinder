@@ -5,7 +5,6 @@ const User = require("./models/user");
 const cookieParser = require("cookie-parser")
 const cors = require("cors");
 const http = require("http")
-const socket = require("socket.io")
 
 
 
@@ -29,6 +28,7 @@ const requestRouter = require("./routes/request");
 const { userAuth } = require("./middlewares/auth");
 const userRouter = require("./routes/user");
 const paymentRouter = require('./routes/payment');
+const initializeSocket = require('./utils/socket');
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
@@ -39,12 +39,9 @@ app.use("/", paymentRouter)
 
 const server = http.createServer(app)
 
-const io = socket(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    credentials: true,
-  },
-})
+// call the socket & pass the server
+initializeSocket(server)
+
 
 // Route to get user by email using Model.findOne()
 // app.get("/user",userAuth,  async (req, res) => {
