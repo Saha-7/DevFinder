@@ -13,7 +13,11 @@ const initializeSocket =(server) =>{
       //Handle connection
       io.on("connection", (socket)=>{
         //Handling different events
-        socket.on("joinChat", ()=>{})
+        socket.on("joinChat", ({userId, targetUserId})=>{
+          const roomId = [userId, targetUserId].join("_")
+          console.log("User joined the chat room", roomId)
+          socket.join(roomId)
+        })
 
         socket.on("sendMessage", ()=>{})
 
