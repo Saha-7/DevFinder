@@ -13,9 +13,9 @@ const initializeSocket =(server) =>{
       //Handle connection
       io.on("connection", (socket)=>{
         //Handling different events
-        socket.on("joinChat", ({userId, targetUserId})=>{
-          const roomId = [userId, targetUserId].join("_")
-          console.log("User joined the chat room", roomId)
+        socket.on("joinChat", ({firstName ,userId, targetUserId})=>{
+          const roomId = [userId, targetUserId].sort().join("_")
+          console.log(firstName + "User joined the chat room " + roomId)
           socket.join(roomId)
         })
 
