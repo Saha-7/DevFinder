@@ -15,11 +15,16 @@ const initializeSocket =(server) =>{
         //Handling different events
         socket.on("joinChat", ({firstName ,userId, targetUserId})=>{
           const roomId = [userId, targetUserId].sort().join("_")
-          console.log(firstName + "User joined the chat room " + roomId)
+          console.log(firstName + " joined the chat room " + roomId)
           socket.join(roomId)
         })
 
-        socket.on("sendMessage", ()=>{})
+        socket.on("sendMessage", ({firstName ,userId, targetUserId, text})=>{
+          const roomId = [userId, targetUserId].sort().join("_")
+          console.log(firstName + " sent a message: " + text + " to " + targetUserId)
+          io.to(roomId).emit("messageReceived", {firstName, text})
+          
+        })
 
         socket.on("disconnect", ()=>{})
       })
