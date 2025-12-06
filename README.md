@@ -1,6 +1,20 @@
 # DevFinder
 
 
+## 🛠 Tech Stack
+- Frontend: React, Redux Toolkit, Tailwind CSS, DaisyUI, React Router
+- Backend: Node.js, Express.js, MongoDB, JWT Auth
+- Cloud & Infra: AWS EC2, Nginx, Cloudflare (SSL + Domain)
+- Email Service: Amazon SES (Automated notifications)
+- DevOps: PM2 for process management, scheduled cron jobs
+ 
+## 🚧 In Progress
+- 💬 Real-time chat using Socket.io
+- 💳 Premium subscription with Razorpay integration
+
+
+
+
 # Deployment
 
     - Signup on AWS 
