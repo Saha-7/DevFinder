@@ -14,8 +14,11 @@ require('./utils/cronjob')
 const app = express();
 app.use(cookieParser())
 app.use(cors({
-  origin: "http://localhost:5173", // Update with your frontend URL
-  credentials: true, // Allow cookies to be sent with requests
+  origin: [
+    "http://localhost:5173",
+    "https://dev-finder-ui.vercel.app"
+  ],
+  credentials: true,
 }))
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
