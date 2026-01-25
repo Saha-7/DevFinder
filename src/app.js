@@ -12,14 +12,21 @@ require('./utils/cronjob')
 
 
 const app = express();
+
 app.use(cookieParser())
+
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://dev-finder-ui.vercel.app"
+    "https://dev-finder-ay1i8vim5-saha7s-projects.vercel.app"
   ],
   credentials: true,
-}))
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+app.options("*", cors());
+
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 
@@ -81,7 +88,7 @@ app.get("/user", userAuth, async (req, res) => {
 });
 
 // Route to get all users (feed)
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).send(users);
