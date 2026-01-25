@@ -42,11 +42,11 @@ const chatRouter = require('./routes/chat')
 const initializeSocket = require('./utils/socket');
 
 // app.use("/", authRouter);
-app.use("/", profileRouter);
-app.use("/", requestRouter);
-app.use("/", userRouter);
-app.use("/", paymentRouter)
-app.use("/", chatRouter)
+//app.use("/", profileRouter);
+//app.use("/", requestRouter);
+//app.use("/", userRouter);
+//app.use("/", paymentRouter)
+//app.use("/", chatRouter)
 
 
 const server = http.createServer(app)
