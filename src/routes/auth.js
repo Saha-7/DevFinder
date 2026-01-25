@@ -28,14 +28,17 @@ authRouter.post("/signup", async (req, res) => {
     const saveduser = await user.save();
     // creating the JWT token
     const token = await user.getJWT();
-    console.log("Token generated:", token);
+    //console.log("Token generated:", token);
 
     // Add the token inside the Cookie
     res.cookie("token", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'  // Allow cross-site
     });
 
-    res.json({ message: "User created successfully", data: saveduser });
+    res.json({ message: "User created successfully", data: saveduser, token }); // send token in response too
   } catch (error) {
     res.status(400).send("Error creating user: " + error.message);
   }
@@ -57,6 +60,9 @@ authRouter.post("/login", async (req, res) => {
       // Add the token inside Cookie
       res.cookie("token", token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
 
       // Method 1: Create a new object with only safe fields
@@ -73,7 +79,7 @@ authRouter.post("/login", async (req, res) => {
 
       res
         .status(200)
-        .json({ message: "Login Successfull!!", Data: userDetail });
+        .json({ message: "Login Successfull!!", Data: userDetail, token });
     } else {
       throw new Error("Invalid Credentials");
     }
