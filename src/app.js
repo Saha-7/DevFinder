@@ -25,7 +25,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-app.options("*", cors());
 
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
@@ -41,12 +40,12 @@ const paymentRouter = require('./routes/payment');
 const chatRouter = require('./routes/chat')
 const initializeSocket = require('./utils/socket');
 
-// app.use("/", authRouter);
-//app.use("/", profileRouter);
-//app.use("/", requestRouter);
-//app.use("/", userRouter);
-//app.use("/", paymentRouter)
-//app.use("/", chatRouter)
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
+app.use("/", paymentRouter)
+app.use("/", chatRouter)
 
 
 const server = http.createServer(app)
