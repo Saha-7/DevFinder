@@ -28,14 +28,14 @@ authRouter.post("/signup", async (req, res) => {
     const saveduser = await user.save();
     // creating the JWT token
     const token = await user.getJWT();
-    console.log("Token generated:", token);
+    //console.log("Token generated:", token);
 
     // Add the token inside the Cookie
     res.cookie("token", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
     });
 
-    res.json({ message: "User created successfully", data: saveduser });
+    res.json({ message: "User created successfully", data: saveduser }); // send token in response too
   } catch (error) {
     res.status(400).send("Error creating user: " + error.message);
   }
