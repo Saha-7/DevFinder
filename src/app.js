@@ -16,14 +16,28 @@ const app = express();
 app.use(cookieParser())
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://dev-finder-ay1i8vim5-saha7s-projects.vercel.app"
-  ],
+  origin: (origin, callback) => {
+    // allow server-to-server, Postman, etc.
+    if (!origin) return callback(null, true);
+
+    // allow localhost
+    if (origin === "http://localhost:5173") {
+      return callback(null, true);
+    }
+
+    // allow ALL Vercel preview + prod domains
+    if (origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+
+    // block everything else
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 }));
+
 
 
 
