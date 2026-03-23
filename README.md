@@ -1,5 +1,9 @@
 # DevFinder
 
+### Demo
+https://github.com/user-attachments/assets/fdd5e4cc-77cd-4d35-b1b6-af73e4d27f5d
+
+
 
 ## 🛠 Tech Stack
 - Frontend: React, Redux Toolkit, Tailwind CSS, DaisyUI, React Router
