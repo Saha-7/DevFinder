@@ -1,0 +1,37 @@
+name: DevFinder Backend CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  backend-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Pull your code onto GitHub's machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node on GitHub's machine
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Step 3: Install your dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Check build works fine
+      - name: Check for syntax errors
+        run: node --check src/app.js
+
+      # Step 5: Only runs on actual merge to main, NOT on PR
+      - name: Deploy to Render
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
