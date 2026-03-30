@@ -10,6 +10,9 @@
   "author": "Pritam Saha",
   "type": "commonjs",
   "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
