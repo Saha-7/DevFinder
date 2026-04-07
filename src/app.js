@@ -3,6 +3,7 @@ require("../instrument.js"); // Sentry
 require('dotenv').config()
 //console.log("MONGO_URL:", process.env.MONGO_URL);
 const express = require("express");
+const rateLimit =require('express-rate-limit');
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const cookieParser = require("cookie-parser")
@@ -17,6 +18,15 @@ require('./utils/cronjob')
 const Sentry = require("@sentry/node"); // Sentry 
 
 const app = express();
+
+const limiter = rateLimit({
+	windowMs: 10 * 60 * 1000, // 10 minutes
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
+	// store: ... , // Redis, Memcached, etc. See below.
+})
 
 app.use(cookieParser())
 
@@ -44,7 +54,7 @@ app.use(cors({
 }));
 
 
-
+app.use(limiter);
 
 // app.use() checks routes inside the code from top to bottom. As soon as first match comes the callback hits.
 
@@ -164,11 +174,16 @@ app.patch("/user/:userId", async (req, res) => {
 });
 
 
+
+
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
 
 Sentry.setupExpressErrorHandler(app);
+
+
+
 
 // optional - sends sentry error id in response
 app.use(function onError(err, req, res, next) {

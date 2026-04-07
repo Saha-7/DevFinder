@@ -26,6 +26,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.3.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4",
     "node-cron": "^4.2.1",
