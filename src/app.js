@@ -1,4 +1,7 @@
+require("../instrument.js"); // Sentry
+
 require('dotenv').config()
+//console.log("MONGO_URL:", process.env.MONGO_URL);
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
@@ -10,6 +13,8 @@ const http = require("http")
 
 require('./utils/cronjob')
 
+
+const Sentry = require("@sentry/node"); // Sentry 
 
 const app = express();
 
@@ -157,6 +162,20 @@ app.patch("/user/:userId", async (req, res) => {
     res.status(500).send("Error updating user: " + error.message);
   }
 });
+
+
+app.get("/debug-sentry", function mainHandler(req, res) {
+  throw new Error("My first Sentry error!");
+});
+
+Sentry.setupExpressErrorHandler(app);
+
+// optional - sends sentry error id in response
+app.use(function onError(err, req, res, next) {
+  res.statusCode = 500;
+  res.end(res.sentry + "\n");
+});
+
 
 connectDB()
   .then(() => {
